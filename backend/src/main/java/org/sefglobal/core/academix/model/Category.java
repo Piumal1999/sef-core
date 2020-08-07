@@ -28,7 +28,6 @@ public class Category extends AuditModel {
     private String name;
 
     @OneToMany(mappedBy = "category",
-               cascade = CascadeType.ALL,
                orphanRemoval = true)
     private List<CategoryTranslation> translations = new ArrayList<>();
 

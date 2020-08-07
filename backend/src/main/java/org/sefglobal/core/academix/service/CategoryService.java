@@ -4,10 +4,7 @@ import org.sefglobal.core.academix.model.Category;
 import org.sefglobal.core.academix.model.CategoryTranslation;
 import org.sefglobal.core.academix.model.Item;
 import org.sefglobal.core.academix.model.SubCategory;
-import org.sefglobal.core.academix.repository.CategoryRepository;
-import org.sefglobal.core.academix.repository.ItemRepository;
-import org.sefglobal.core.academix.repository.LanguageRepository;
-import org.sefglobal.core.academix.repository.SubCategoryRepository;
+import org.sefglobal.core.academix.repository.*;
 import org.sefglobal.core.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +18,18 @@ public class CategoryService {
 
     private final static Logger log = LoggerFactory.getLogger(CategoryService.class);
     private final CategoryRepository categoryRepository;
+    private final CategoryTranslationRepository categoryTranslationRepository;
     private final SubCategoryRepository subCategoryRepository;
     public final LanguageRepository languageRepository;
     public final ItemRepository itemRepository;
 
     public CategoryService(CategoryRepository categoryRepository,
+                           CategoryTranslationRepository categoryTranslationRepository,
                            SubCategoryRepository subCategoryRepository,
                            LanguageRepository languageRepository,
                            ItemRepository itemRepository) {
         this.categoryRepository = categoryRepository;
+        this.categoryTranslationRepository = categoryTranslationRepository;
         this.subCategoryRepository = subCategoryRepository;
         this.languageRepository = languageRepository;
         this.itemRepository = itemRepository;
@@ -88,6 +88,12 @@ public class CategoryService {
      * @return the created {@link Category}
      */
     public Category addCategory(Category category) {
+        List<CategoryTranslation> translations = category.getTranslations();
+        for (CategoryTranslation translation:translations) {
+            translation.setCategory(category);
+            translation.setLanguage(languageRepository.getOne(translation.getLanguage().getId()));
+            categoryTranslationRepository.save(translation);
+        }
         return categoryRepository.save(category);
     }
 
